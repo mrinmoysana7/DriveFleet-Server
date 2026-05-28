@@ -1,12 +1,11 @@
 const express = require("express");
 const cors = require("cors");
-const { MongoClient, ServerApiVersion } = require("mongodb");
+const { MongoClient, ServerApiVersion, ObjectId } = require("mongodb");
 const dotenv = require("dotenv");
 dotenv.config();
 
 const uri = process.env.MONGODB_URI;
 const port = process.env.PORT || 5000;
-
 
 const app = express();
 app.use(cors());
@@ -27,9 +26,30 @@ async function run() {
     const database = client.db("drivefleet");
     const carsCollection = database.collection("cars");
 
-    app.post("/rental-car", async (req, res) => {
+    const RentalCarsCollection = database.collection("addedCars");
+
+    app.get("/available-cars", async (req, res) => {
+      const result = await carsCollection.find().toArray();
+      res.send(result);
+    });
+
+    app.get("/available-cars/:id", async (req, res) => {
+      const id = req.params.id;
+      const query = {
+        _id: new ObjectId(id),
+      };
+      const result = await carsCollection.findOne(query);
+      res.send(result);
+    });
+
+    app.post("/added-cars", async (req, res) => {
       const rentalCarData = req.body;
-      const result = await carsCollection.insertOne(rentalCarData);
+      const result = await RentalCarsCollection.insertOne(rentalCarData);
+      res.send(result);
+    });
+
+    app.get("/added-cars", async (req, res) => {
+      const result = await RentalCarsCollection.find().toArray();
       res.send(result);
     });
 
