@@ -30,6 +30,8 @@ async function run() {
 
     app.get("/available-cars", async (req, res) => {
       const result = await carsCollection.find().toArray();
+
+      
       res.send(result);
     });
 
