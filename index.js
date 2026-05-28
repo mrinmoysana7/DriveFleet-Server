@@ -28,6 +28,10 @@ async function run() {
 
     const RentalCarsCollection = database.collection("addedCars");
 
+    const testimonialCollection = database.collection("testimonials");
+
+    const bookingCollection = database.collection("bookings");
+
     app.get("/available-cars", async (req, res) => {
       const result = await carsCollection.find().toArray();
       res.send(result);
@@ -64,14 +68,29 @@ async function run() {
       res.send(result);
     });
 
-    
-
     app.delete("/added-cars/:id", async (req, res) => {
       const id = req.params.id;
       const query = {
         _id: new ObjectId(id),
       };
       const result = await RentalCarsCollection.deleteOne(query);
+      res.send(result);
+    });
+
+    app.get("/testimonials", async (req, res) => {
+      const result = await testimonialCollection.find().toArray();
+      res.send(result);
+    });
+
+    app.post("/booking", async (req, res) => {
+      const bookingData = req.body;
+      const result = await bookingCollection.insertOne(bookingData);
+      res.send(result);
+    });
+
+    app.get("/booking/:userId", async (req, res) => {
+      const { userId } = req.params;
+      const result = await bookingCollection.find({ userID: userId }).toArray();
       res.send(result);
     });
 
